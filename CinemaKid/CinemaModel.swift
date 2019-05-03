@@ -5,29 +5,77 @@
 //  Created by ktds 10 on 03/05/2019.
 //  Copyright © 2019 kt ds. All rights reserved.
 //
-
+import UIKit
 import Foundation
 
-class CinemaModel {
+//let Noti_didReceiveMovieList = NSNotification.Name(rawValue: "didReceiveMovieList")
+
+typealias ClosureUpdateUI = () -> Void
+
+class CinemaModel : NSObject {
     
+    var afterUpdateUI:ClosureUpdateUI?
+    //@objc dynamic var arrayResult:[[String:Any]] = []
     var arrayResult:[[String:Any]] = []
     
-    func requestToServer() {
+    func requestToServer(closureUpdateUI:ClosureUpdateUI?) {
+        
+        self.afterUpdateUI = closureUpdateUI
+        
         let stringURL = "http://z.ebadaq.com:45070/CinemaKid/movie/list/"
         let url = URL(string: stringURL)!
-        do {
-            let rValue = try String(contentsOf: url, encoding: .utf8)
+        
+        let request = URLRequest(url: url)
+        
+        //request.allHTTPHeaderFields
+        //request.httpBody
+        //request.httpMethod
+        
+        let session = URLSession(configuration: URLSessionConfiguration.ephemeral)
+        
+        let task = session.dataTask(with: request) {
+            (data:Data?, resp:URLResponse?, err:Error?) in
             
-            let data = rValue.data(using: .utf8)!
+            guard let d = data else {
+                return
+            }
+
+            let result = try! JSONSerialization.jsonObject(with: d, options: .allowFragments)
+            self.arrayResult = (result as! [String:Any])["data"] as! [[String:Any]]
+            print(result)
             
-            let result = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+            if let c = self.afterUpdateUI {
+                OperationQueue.main.addOperation {
+                    c()
+                }
+            }
             
-            let temp = result as! [String:Any]
-            //let movies = temp["data"] as! [[String:Any]]
+            //NotificationCenter.default.post(name: Noti_didReceiveMovieList, object: nil)
             
-            self.arrayResult = temp["data"] as! [[String:Any]]
-            //print(movies)
-        } catch {}
+//            OperationQueue.main.addOperation {
+//                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+//                let vcNavi = appDelegate.window?.rootViewController as! UINavigationController
+//                let vcMaster = vcNavi.viewControllers.first as! MasterViewController
+//                vcMaster.tableView.reloadData()
+//            }
+        }
+        task.resume()
+
+
+//        do {
+//            let rValue = try String(contentsOf: url, encoding: .utf8)
+//
+//            let data = rValue.data(using: .utf8)!
+//
+//            let result = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
+//
+//            let temp = result as! [String:Any]
+//            //let movies = temp["data"] as! [[String:Any]]
+//
+//            self.arrayResult = temp["data"] as! [[String:Any]]
+//            //print(movies)
+//        } catch {}
+
     }
     
 }

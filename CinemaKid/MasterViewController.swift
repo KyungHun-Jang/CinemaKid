@@ -11,14 +11,28 @@ import UIKit
 class MasterViewController: UITableViewController {
 
     let modelCinema = CinemaModel()
-    
-
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        modelCinema.requestToServer()
+        modelCinema.requestToServer(){
+            self.tableView.reloadData()
+        }
+        //modelCinema.afterUpdateUI = {}
+        
+        //감시하려는 객체에게 옵저버 추가
+        //K.V.O
+        //modelCinema.addObserver(self, forKeyPath: #keyPath(CinemaModel.arrayResult), options: [.initial, .new], context: nil)
+        
+        //NotificationCenter.default.addObserver(forName: Noti_didReceiveMovieList, object: nil, queue: .main, using: {_ in self.tableView.reloadData()})
     }
+    
+//    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+//        OperationQueue.main.addOperation {
+//            self.tableView.reloadData()
+//        }
+//
+//    }
 
     // MARK: - Table View
 
