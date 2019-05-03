@@ -9,7 +9,7 @@
 import UIKit
 
 class MasterViewController: UITableViewController {
-
+    let queueSub = OperationQueue()
     let modelCinema = CinemaModel()
 
     override func viewDidLoad() {
@@ -75,11 +75,23 @@ class MasterViewController: UITableViewController {
         
         cell.imageView?.image = image
 */
-        self.performSelector(inBackground: #selector(procImage), with: ["code":movie["posterCode"] as! String, "cell":cell])
+        //self.performSelector(inBackground: #selector(procImage), with: ["code":movie["posterCode"] as! String, "cell":cell])
+        
+        queueSub.addOperation {
+            var stringURL = "http://z.ebadaq.com:45070/CinemaKid/movie/stillcut/"
+            stringURL = stringURL + (movie["posterCode"] as! String)
+            
+            let data = try! Data(contentsOf: URL(string: stringURL)!)
+            let image = UIImage(data: data)
+            
+            OperationQueue.main.addOperation {
+                cell.imageView?.image = image
+            }
+        }
         
         return cell
     }
-    
+/*
     @objc func procImage(dic:[String:Any]) {
         autoreleasepool {
             var stringURL = "http://z.ebadaq.com:45070/CinemaKid/movie/stillcut/"
@@ -101,7 +113,7 @@ class MasterViewController: UITableViewController {
         
         cell.imageView?.image = image
     }
-    
+*/
 
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
