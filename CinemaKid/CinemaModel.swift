@@ -18,6 +18,7 @@ class CinemaModel : NSObject {
     //@objc dynamic var arrayResult:[[String:Any]] = []
     var arrayResult:[[String:Any]] = []
     
+    //@eascaping 별도 스터디 필요
     func requestToServer(closureUpdateUI:ClosureUpdateUI?) {
         
         self.afterUpdateUI = closureUpdateUI

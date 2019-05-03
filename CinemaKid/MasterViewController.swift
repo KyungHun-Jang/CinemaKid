@@ -15,8 +15,18 @@ class MasterViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        modelCinema.requestToServer(){
-            self.tableView.reloadData()
+        //zeroing weak pointer
+        //weak var a = CinemaModel()
+        //var b = a
+        
+        //weak var weakSelf:MasterViewController? = self
+        
+        modelCinema.requestToServer(){ [weak self] in
+//            if let selfStrong = weakSelf {
+//                selfStrong.tableView.reloadData()
+//            }
+            self?.tableView.reloadData()
+            
         }
         //modelCinema.afterUpdateUI = {}
         
