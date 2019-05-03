@@ -15,6 +15,8 @@ class MasterViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.title = "CinemaKids"
+        
         //zeroing weak pointer
         //weak var a = CinemaModel()
         //var b = a
@@ -61,9 +63,45 @@ class MasterViewController: UITableViewController {
         
         cell.textLabel?.text = movie["title"] as? String
         cell.detailTextLabel?.text = movie["genre"] as? String
-
+        cell.imageView?.image = UIImage(named: "loading")
+        
+        // 이미지 가져오기
+        /*
+        var stringURL = "http://z.ebadaq.com:45070/CinemaKid/movie/stillcut/"
+        stringURL = stringURL + (movie["posterCode"] as! String)
+        
+        let data = try! Data(contentsOf: URL(string: stringURL)!)
+        let image = UIImage(data: data)
+        
+        cell.imageView?.image = image
+*/
+        self.performSelector(inBackground: #selector(procImage), with: ["code":movie["posterCode"] as! String, "cell":cell])
+        
         return cell
     }
+    
+    @objc func procImage(dic:[String:Any]) {
+        autoreleasepool {
+            var stringURL = "http://z.ebadaq.com:45070/CinemaKid/movie/stillcut/"
+            stringURL = stringURL + (dic["code"] as! String)
+            
+            let data = try! Data(contentsOf: URL(string: stringURL)!)
+            let image = UIImage(data: data)
+            let cell = dic["cell"] as! UITableViewCell
+            
+            self.performSelector(onMainThread: #selector(updateImage), with:["cell":cell, "image":image], waitUntilDone: true)
+            
+            cell.imageView?.image = image
+        }
+    }
+    
+    @objc func updateImage(dic:[String:Any]){
+        let cell = dic["cell"] as! UITableViewCell
+        let image = dic["image"] as! UIImage
+        
+        cell.imageView?.image = image
+    }
+    
 
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
